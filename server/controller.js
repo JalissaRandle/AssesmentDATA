@@ -235,23 +235,33 @@ module.exports = {
         
         
     },
-    // getCountries: (req, res) => {
-    //     sequelize.query(`
-    //         SELECT * FROM countries
-    //     `)
-    //     .then(dbRes => res.status(200).send(dbRes[0]))
-    // }, 
+
+    getCountries: (req, res) => {
+        sequelize.query(`
+            SELECT * FROM countries;
+        `).then(dbRes => res.status(200).send(dbRes[0]))
+    }, 
     createCity: (req, res) => {
-        let {
-            name,
-            rating,
-            countryID
-        } = req.body 
+        const{ name, rating, countryId} = req.body
         sequelize.query(`
         INSERT INTO cities (name, rating, country_id)
-        VALUES(${name}, ${rating},${country_id})
-        RETURNING *;`)
-        .then(dbRes => res.status(200).send(dbRes[0]))
+            VALUES('${name}', ${rating},${countryId})
+        `).then(dbRes => res.status(200).send(dbRes[0]))
+    },
+    getCities: (req, res) =>{
+        sequelize.query(`
+         Select ci.city_id, ci.name AS city, ci.rating, co.country_id, co.name As country
+            FROM cities AS ci
+                join countries AS co ON ci.country_id = co.country_id;
+        `).then(dbRes => res.status(200).send(dbRes[0]))
+    },
+
+    deleteCity: (req, res) => {
+        const { id } = req.params
+        sequelize.query(`
+            DELETE FROM cities
+            Where city_id= ${id}
+        `).then(dbRes => res.status(200).send(dbRes[0]))
     }
 }
 
